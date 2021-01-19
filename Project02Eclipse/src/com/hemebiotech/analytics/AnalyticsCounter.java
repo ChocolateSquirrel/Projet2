@@ -1,43 +1,60 @@
 package com.hemebiotech.analytics;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.TreeMap;
 
+/**
+ * 
+ * @author Marie
+ *
+ */
 public class AnalyticsCounter {
-	private static int headacheCount = 0;	// initialize to 0
-	private static int rashCount = 0;		// initialize to 0
-	private static int pupilCount = 0;		// initialize to 0
+	private ReadSymptomDataFromFile reader;
+	private List<String> symptomsList = new ArrayList<String>();
+	private TreeMap<String, Integer> symptomsMap = new TreeMap<String,Integer>();
 	
-	public static void main(String args[]) throws Exception {
-		// first get input
-		BufferedReader reader = new BufferedReader (new FileReader("symptoms.txt"));
-		String line = reader.readLine();
-
-		int i = 0;	// set i to 0
-		int headCount = 0;	// counts headaches
-		while (line != null) {
-			i++;	// increment i
-			System.out.println("symptom from file: " + line);
-			if (line.equals("headache")) {
-				headCount++;
-				System.out.println("number of headaches: " + headCount);
+	public AnalyticsCounter(String path) {
+		reader = new ReadSymptomDataFromFile(path);
+	}
+	
+	/**
+	 * Fill symptomsList with symptoms from the reader (@see ReadSymptomDataFromFile)
+	 */
+	public void read() {
+		symptomsList = reader.getSymptoms();
+	}
+	
+	/**
+	 * Transform a raw list of symptoms (symptomsList) into a TreeMap (symptomsMap) in which keys are sorted by natural order
+	 * <ul>
+	 * 		<li>key (String) : symptom</li>
+	 * 		<li>value (Integer) : number of times the symptom appears in the list</li>
+	 * </ul>
+	 */
+	public void analyse(){
+		for (String symptom : symptomsList) {
+			if (symptomsMap.containsKey(symptom)) {
+				symptomsMap.put(symptom, symptomsMap.get(symptom)+1);
+			} else {
+				symptomsMap.put(symptom, 1);
 			}
-			else if (line.equals("rush")) {
-				rashCount++;
-			}
-			else if (line.contains("pupils")) {
-				pupilCount++;
-			}
-
-			line = reader.readLine();	// get another symptom
 		}
-		
-		// next generate output
-		FileWriter writer = new FileWriter ("result.out");
-		writer.write("headache: " + headacheCount + "\n");
-		writer.write("rash: " + rashCount + "\n");
-		writer.write("dialated pupils: " + pupilCount + "\n");
-		writer.close();
+	}
+	
+	/**
+	 * Write into a file, on each line, "key : value" of the symptomsMap
+	 * @param nameOfFile
+	 */
+	public void write(String nameOfFile) {
+		try (FileWriter writer = new FileWriter(nameOfFile)){
+			for (String key : symptomsMap.keySet()) {
+				writer.write(key + " : " + symptomsMap.get(key) + "\n");
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }
