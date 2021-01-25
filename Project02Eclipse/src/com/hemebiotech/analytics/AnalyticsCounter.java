@@ -52,14 +52,13 @@ public class AnalyticsCounter {
 	 */
 	public void write(String nameOfFile) {
 		try (FileWriter writer = new FileWriter(nameOfFile)){
-			BiConsumer<String, Integer> printMap = (key, value) -> {
+			symptomsMap.forEach((key, value) -> {
 				try {
 					writer.write(key + " : "+ value + "\n");
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-			};
-			symptomsMap.forEach(printMap);
+			});
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
