@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
+import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 
 /**
  * 
@@ -50,9 +52,14 @@ public class AnalyticsCounter {
 	 */
 	public void write(String nameOfFile) {
 		try (FileWriter writer = new FileWriter(nameOfFile)){
-			for (String key : symptomsMap.keySet()) {
-				writer.write(key + " : " + symptomsMap.get(key) + "\n");
-			}
+			BiConsumer<String, Integer> printMap = (key, value) -> {
+				try {
+					writer.write(key + " : "+ value + "\n");
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			};
+			symptomsMap.forEach(printMap);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
