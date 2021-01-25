@@ -4,18 +4,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.TreeMap;
-import java.util.function.BiConsumer;
-import static java.util.stream.Collectors.toMap;
-import static java.util.stream.Collectors.collectingAndThen;;
 
-/**
- * 
- * @author Marie
- *
- */
+
 public class AnalyticsCounter {
 	private ISymptomReader reader;
 	private List<String> symptomsList = new ArrayList<String>();
