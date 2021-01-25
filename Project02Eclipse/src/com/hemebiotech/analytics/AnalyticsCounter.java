@@ -4,9 +4,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.TreeMap;
 import java.util.function.BiConsumer;
-import java.util.stream.Collectors;
+import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.collectingAndThen;;
 
 /**
  * 
@@ -14,7 +17,7 @@ import java.util.stream.Collectors;
  *
  */
 public class AnalyticsCounter {
-	private ReadSymptomDataFromFile reader;
+	private ISymptomReader reader;
 	private List<String> symptomsList = new ArrayList<String>();
 	private TreeMap<String, Integer> symptomsMap = new TreeMap<String,Integer>();
 	
@@ -28,7 +31,7 @@ public class AnalyticsCounter {
 	public void read() {
 		symptomsList = reader.getSymptoms();
 	}
-	
+
 	/**
 	 * Transform a raw list of symptoms (symptomsList) into a TreeMap (symptomsMap) in which keys are sorted by natural order
 	 * <ul>
@@ -49,18 +52,15 @@ public class AnalyticsCounter {
 	/**
 	 * Write into a file, on each line, "key : value" of the symptomsMap
 	 * @param nameOfFile
+	 * @throws IOException 
 	 */
-	public void write(String nameOfFile) {
-		try (FileWriter writer = new FileWriter(nameOfFile)){
-			symptomsMap.forEach((key, value) -> {
-				try {
-					writer.write(key + " : "+ value + "\n");
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			});
-		} catch (IOException e) {
-			e.printStackTrace();
+	public void write(String nameOfFile) throws IOException {
+		try (FileWriter writer = new FileWriter(nameOfFile)) {
+			String content = symptomsMap.entrySet().stream()
+					.map(e -> e.getKey()+ " : " + e.getValue())
+					.reduce((a, b) -> a + "\n" + b).orElse("");
+			writer.write(content);
 		}
+		
 	}
 }
